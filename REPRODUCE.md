@@ -4,7 +4,7 @@ Written after doing it once. Every trap below is one we actually hit — several
 fail **silently**, which is the worst way for an unattended overnight agent to fail.
 
 **Time required:** ~40 minutes, plus one manual funding step that only you can do.
-**Minimum capital:** 30 USDT to see it work end to end; ~170 USDT to reproduce our
+**Minimum capital:** 30 USDT to see it work end to end; ~180 USDT to reproduce our
 four-symbol equal-risk configuration.
 
 ---
@@ -18,6 +18,7 @@ public and unauthenticated.
 git clone <this-repo> && cd bn-ai-2
 python3 -m pytest tests/ -v            # 18 tests, including the Labor Day assertion
 python3 scripts/gap_analysis.py        # off-hours vs. opening volatility, all symbols
+python3 scripts/cohort_stats.py        # the §1 and §4 tables, with cohort filtering shown
 python3 scripts/falsify.py             # the two falsification tests from README §3
 python3 scripts/make_figures.py        # regenerates both figures in docs/figures/
 ```

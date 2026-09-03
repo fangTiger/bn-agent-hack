@@ -57,7 +57,7 @@ PY
 )"
 
 if [ "$WINDOW" != "GUARD_WINDOW" ]; then
-    echo "[$TS] $WINDOW —— 不在收盘前守护窗口内，无需行动"
+    echo "[$TS] $WINDOW — outside the pre-close guard window, no action needed"
     exit 0
 fi
 
@@ -71,7 +71,7 @@ fi
 # 并在 prompt 内全部使用绝对路径。
 MCP_ROOT="$(dirname "$ROOT")"
 
-echo "[$TS] 存在待执行决策，唤醒 agent"
+echo "[$TS] Inside the guard window — waking the agent"
 (
   cd "$MCP_ROOT"
   "$CLAUDE_BIN" -p "$(cat "$ROOT/ops/agent_prompt.md")" \
@@ -79,4 +79,4 @@ echo "[$TS] 存在待执行决策，唤醒 agent"
         "mcp__binance-mcp-server__spot_newOrder,mcp__binance-mcp-server__spot_getOrder,mcp__binance-mcp-server__spot_getAccount,mcp__binance-mcp-server__spot_getOpenOrders,Read,Write"
 ) >> "$ROOT/log/agent_${DAY}.log" 2>&1
 
-echo "[$TS] tick 完成"
+echo "[$TS] tick complete"

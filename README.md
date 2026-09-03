@@ -3,7 +3,7 @@
 **An agent that knows what time it is.**
 
 > Binance will sell you Tesla stock at 3 AM on a Sunday.
-> But the real Tesla hasn't traded in 61 hours. What you see is a placeholder.
+> But the real Tesla hasn't traded in 35 hours. What you see is a placeholder.
 
 Tokenized US equities (bstock) trade on Binance 24/7. Their underlying market is open
 **32.5 hours a week**. Every trading bot treats that price series as continuous.
@@ -19,16 +19,16 @@ cannot see.
 
 ## 1. The observation
 
-Measured on 30-minute candles across **64 bstock symbols with sufficient history,
-3,670 opening events**. The 30-minute granularity matters: a 1-hour candle containing
+Measured on 30-minute candles across **63 bstock symbols with sufficient history,
+2,283 opening events**. The 30-minute granularity matters: a 1-hour candle containing
 the 13:30 open also contains 30 minutes of pre-market quiet, which dilutes the effect.
 
 | | Off-hours volatility (per 30 min) | First 30 min after open | Ratio |
 |---|---|---|---|
-| SPYB (S&P 500 ETF) | 0.05% | 0.16% | 3.5x |
-| TSLAB (Tesla) | 0.12% | 1.26% | **10.4x** |
-| NBISB (Nebius) | 0.39% | 3.48% | 8.8x |
-| **All 64 symbols (median)** | | | **7.3x** (range 1.5x–13.3x) |
+| SPYB (S&P 500 ETF) | 0.046% | 0.159% | 3.5x |
+| TSLAB (Tesla) | 0.121% | 1.259% | **10.4x** |
+| NBISB (Nebius) | 0.394% | 3.476% | 8.8x |
+| **All 63 symbols (median)** | | | **7.4x** (range 3.4x–13.3x) |
 
 While the underlying market is closed, the token's price is nearly frozen — market
 makers quote it, but they do not move it. When the underlying reopens, the accumulated
@@ -75,7 +75,7 @@ exactly Binance's 10 bps fee.**
 
 > The efficiency boundary of this market is precisely the width of its own fee.
 
-That is why the structure persists unarbitraged — and why, for an agent with 290 USDT,
+That is why the structure persists unarbitraged — and why, for an agent with 301 USDT,
 the only rational behaviour is to manage risk rather than chase return.
 
 ## 4. What the agent does
@@ -86,10 +86,10 @@ difference in elapsed time. The resulting gap is the same size:
 
 | | Mean move at the open | n |
 |---|---|---|
-| Monday (after a 65.5h closure) | **1.544%** | 721 |
-| Tuesday–Friday (after 17.5h) | **1.541%** | 2,949 |
+| Monday (after a 65.5h closure) | **2.049%** | 443 |
+| Tuesday–Friday (after 17.5h) | **2.038%** | 1,840 |
 
-**Ratio: 1.00x.** A square-root-of-time model predicts 1.93x. Information arrives on
+**Ratio: 1.01x.** A square-root-of-time model predicts 1.93x. Information arrives on
 business days, not on weekends — so a system that scales risk by calendar time would
 over-hedge every weekend by nearly 2x and pay the fees for nothing.
 
@@ -174,13 +174,13 @@ of market event an LLM agent is suited to.
 
 Real capital, real orders, in an Agentic sub-account.
 
-- Deployed: **169 USDT** across four symbols, equal-risk weighted
+- Deployed: **179 USDT** of exposure across four symbols, equal-risk weighted
 - Risk budget: 1.5% of equity per opening event
 - Worst case (all four stops filling on the limit leg): **−7 USDT**
 
-Positions opened 2026-09-03, equal-risk weighted so that three of the four contribute
-an identical 1.08 USDT of stress loss. SPYB is capped by a concentration limit rather
-than by risk: at a 0.34% p90 gap, equal-risk weighting would demand a 318 USDT position,
+Positions opened 2026-09-03, equal-risk weighted: three of the four sit between 1.11
+and 1.21 USDT of stress loss against the same 1.128 USDT per-symbol budget. SPYB is capped by a concentration limit rather
+than by risk: at a 0.34% p90 gap, equal-risk weighting would demand a 329 USDT position,
 which exceeds the entire account. **That constraint is structural, not a funding
 shortfall** — the required notional scales linearly with equity, so no amount of capital
 resolves it. Every risk-parity book needs a concentration cap for exactly this reason.
@@ -195,7 +195,7 @@ session whose next open is Tuesday the 8th, not Monday the 7th.
 1. **The natural experiment rests on 2 dates.** 11 observations. It is our strongest
    causal evidence and also our thinnest. It is corroborated independently by the
    60-trading-day off-hours/open comparison, which does not depend on those dates.
-2. **n=3,670 is not 3,670 independent observations.** They span only ~60 distinct
+2. **n=2,283 is not 2,283 independent observations.** They span only 59 distinct
    trading days, and symbols are highly correlated within any given day. The effective
    sample size is closer to the number of days than the number of rows.
 3. **bstock listed in June 2026.** Per-symbol history is 21–59 opening events.
@@ -218,7 +218,7 @@ four environment traps that cost us hours and will silently break an unattended 
   contracts exist on the same underlyings and also trade 24/7. Their basis against
   bstock spot is far tighter than the gap itself, so a hedge would neutralise most of
   this risk — at the cost of doubling the leg count and adding liquidation risk to a
-  290 USDT account. Out of scope here, but the most promising direction for future work.
+  301 USDT account. Out of scope here, but the most promising direction for future work.
   (We flag it explicitly because a reviewer who knows these contracts exist should see
   that we do too.)
 - **OCO bracket orders** — not exposed in the MCP tool surface.
