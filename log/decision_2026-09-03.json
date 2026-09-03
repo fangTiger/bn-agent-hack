@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-09-03T16:17:11.328387+00:00",
+  "next_open": "2026-09-04T13:30:00+00:00",
+  "skipped_reason": null,
+  "decisions": [
+    {
+      "action": "PLACE_STOP",
+      "symbol": "BMNRBUSDT",
+      "quantity": 2.31,
+      "stop_price": 25.19,
+      "limit_price": 24.68,
+      "reason": "Stress loss 1.2102 USDT exceeds the equal-risk budget 1.1283 USDT, but the trim notional falls below 5 USDT; placing protective stop only",
+      "risk_before": 1.2102456818822882,
+      "risk_after": 1.2102456818822882
+    },
+    {
+      "action": "PLACE_STOP",
+      "symbol": "NBISBUSDT",
+      "quantity": 0.069,
+      "stop_price": 191.95,
+      "limit_price": 187.79,
+      "reason": "Stress loss 1.1069 USDT is within the equal-risk budget 1.1283 USDT; placing protective stop",
+      "risk_before": 1.106926339995623,
+      "risk_after": 1.106926339995623
+    },
+    {
+      "action": "PLACE_STOP",
+      "symbol": "SPYBUSDT",
+      "quantity": 0.077,
+      "stop_price": 769.64,
+      "limit_price": 754.19,
+      "reason": "Stress loss 0.2061 USDT is within the equal-risk budget 1.1283 USDT; placing protective stop",
+      "risk_before": 0.20613490598041354,
+      "risk_after": 0.20613490598041354
+    },
+    {
+      "action": "PLACE_STOP",
+      "symbol": "TSLABUSDT",
+      "quantity": 0.117,
+      "stop_price": 373.15,
+      "limit_price": 365.49,
+      "reason": "Stress loss 1.1629 USDT exceeds the equal-risk budget 1.1283 USDT, but the trim notional falls below 5 USDT; placing protective stop only",
+      "risk_before": 1.1628604926652342,
+      "risk_after": 1.1628604926652342
+    }
+  ]
+}

@@ -4,7 +4,9 @@ data/*_1d.json
 data/*_30m.json
 
 # 运行时产物
-log/
+# 注意必须写 log/* 而非 log/：排除目录本身会让 git 不再进入该目录，
+# 后面的 ! 例外规则将永远不生效
+log/*
 # 例外：决策与成交回执是本项目的核心证据，必须公开
 !log/decision_*.json
 !log/execution_*.jsonl
