@@ -76,7 +76,7 @@ echo "[$TS] Inside the guard window — waking the agent"
   cd "$MCP_ROOT"
   "$CLAUDE_BIN" -p "$(cat "$ROOT/ops/agent_prompt.md")" \
       --allowedTools \
-        "mcp__binance-mcp-server__spot_newOrder,mcp__binance-mcp-server__spot_getOrder,mcp__binance-mcp-server__spot_getAccount,mcp__binance-mcp-server__spot_getOpenOrders,Read,Write"
+        "mcp__binance-mcp-server__spot_newOrder,mcp__binance-mcp-server__spot_getOrder,mcp__binance-mcp-server__spot_getAccount,mcp__binance-mcp-server__spot_getOpenOrders,mcp__binance-mcp-server__spot_tickerPrice,mcp__binance-mcp-server__spot_deleteOrder,Read,Write,Bash"
 ) >> "$ROOT/log/agent_${DAY}.log" 2>&1
 
 echo "[$TS] tick complete"

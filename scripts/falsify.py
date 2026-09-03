@@ -16,7 +16,11 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from gap_analysis import fetch_klines, to_utc  # noqa: E402
+from src.market_clock import MarketClock  # noqa: E402
+
+CLOCK = MarketClock()
 
 # 币安现货 maker/taker 均 0.1%，一次买卖来回 0.2%
 ROUND_TRIP_FEE = 0.002
@@ -62,6 +66,12 @@ def collect() -> tuple[list, list, list]:
             ts = to_utc(ts_ms)
             # 只取常规交易日开盘那一根（13:30 UTC，数据区间全在夏令时内）
             if ts.weekday() >= 5 or ts.hour != 13 or ts.minute != 30:
+                continue
+            # 美股休市日当天没有开盘，不能算作一次开盘事件
+            try:
+                if CLOCK.state(ts.replace(minute=45)) != "OPEN":
+                    continue
+            except Exception:
                 continue
             open_px, close_px = float(bar[1]), float(bar[4])
             if not open_px:

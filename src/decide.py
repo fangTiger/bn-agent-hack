@@ -190,15 +190,32 @@ def _decide_symbol(
         else:
             remaining = max(0.0, quantity - float(trim_quantity))
             risk_after = remaining * mid * stress_rate
+            # 减仓之后仍要为剩余仓位挂保护单。若只减不挂，风险最高的那个仓位
+            # 反而成了唯一没有保护的仓位——那是用一个更小的问题换来一个更大的。
+            remaining_qty = _round_down_quantity(remaining, step_size)
+            stop_after = _round_down_price(mid * (1 - p90), tick_size)
+            limit_after = _round_down_price(
+                mid * (1 - p90 - float(SLIPPAGE_BUFFER)), tick_size
+            )
+            protectable = (
+                remaining_qty > 0 and limit_after > 0
+                and remaining_qty * limit_after >= min_notional
+                and limit_after > Decimal(str(weighted_avg)) * SELL_PRICE_FLOOR
+            )
+            note = (
+                "; then place a protective stop on the remainder"
+                if protectable
+                else "; the remainder is too small to carry a protective stop"
+            )
             return Decision(
                 "TRIM",
                 symbol,
                 float(trim_quantity),
-                None,
-                None,
+                float(stop_after) if protectable else None,
+                float(limit_after) if protectable else None,
                 (
                     f"Stress loss {risk_before:.4f} USDT exceeds the equal-risk budget "
-                    f"{symbol_budget:.4f} USDT; trimming down to budget"
+                    f"{symbol_budget:.4f} USDT; trimming down to budget{note}"
                 ),
                 risk_before,
                 risk_after,

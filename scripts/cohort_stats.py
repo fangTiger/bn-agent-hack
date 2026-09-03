@@ -17,7 +17,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from gap_analysis import fetch_klines, to_utc  # noqa: E402
+from src.market_clock import MarketClock  # noqa: E402
+
+CLOCK = MarketClock()
 
 # bstock 于 2026-06 起陆续上线；早于此的标的一律不是代币化美股
 BSTOCK_LISTED_AFTER = datetime(2026, 5, 1, tzinfo=timezone.utc)
@@ -50,7 +54,18 @@ def measure(symbol: str):
             continue
         move = abs((close_px - open_px) / open_px)
         weekday, hour, minute = ts.weekday(), ts.hour, ts.minute
+        # 休市日（如六月节、独立日）当天没有开盘，那一根不能计入开盘事件——
+        # 它正是 README §2 用作对照组的窗口。
+        # 日历只覆盖 2026-2027；越界者必然不是 bstock，按非开盘处理，随后会被上市时间过滤剔除。
         if weekday < 5 and hour == OPEN_HOUR and minute == OPEN_MINUTE:
+            try:
+                really_open = CLOCK.state(ts.replace(minute=45)) == "OPEN"
+            except Exception:
+                really_open = False
+        else:
+            really_open = False
+
+        if really_open:
             post.append(move)
             (monday if weekday == 0 else other).append(move)
         elif not (weekday < 5 and (OPEN_HOUR, OPEN_MINUTE) <= (hour, minute) < (CLOSE_HOUR, 0)):

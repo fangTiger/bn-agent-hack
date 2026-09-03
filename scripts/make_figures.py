@@ -21,7 +21,10 @@ import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT))
 from gap_analysis import fetch_klines, to_utc  # noqa: E402
+from src.calibrate import calibrate  # noqa: E402
+from src.market_clock import MarketClock  # noqa: E402
 
 FIG_DIR = ROOT / "docs" / "figures"
 
@@ -120,15 +123,16 @@ def fig1_holiday():
 
 def fig2_stoploss():
     """核心演示图：同一份代码，对四个标的算出差异巨大的止损距离"""
+    # 必须走生产标定，而不是本文件另算一份：图上写着「同一份代码」，
+    # 若用简单收益+离散分位数，就会和 README 紧邻的表格对不上。
     demo = ["SPYBUSDT", "BMNRBUSDT", "TSLABUSDT", "NBISBUSDT"]
+    clock = MarketClock()
     rows = []
     for s in demo:
-        norm, _, closed = opening_samples(s)
-        if len(norm) < 20:
-            continue
-        srt = sorted(norm)
-        p90 = srt[int(len(srt) * 0.90)]
-        rows.append((s.replace("BUSDT", ""), p90, statistics.mean(closed), len(norm)))
+        profile = calibrate(s, clock)
+        _, _, closed = opening_samples(s)
+        rows.append((s.replace("BUSDT", ""), profile.p90,
+                     statistics.mean(closed), profile.n_samples))
     rows.sort(key=lambda r: r[1])
 
     fig, ax = plt.subplots(figsize=(13, 7))

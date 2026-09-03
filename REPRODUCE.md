@@ -15,7 +15,8 @@ Every claim in the README is verifiable without an account. Binance market data 
 public and unauthenticated.
 
 ```bash
-git clone <this-repo> && cd bn-ai-2
+git clone https://github.com/fangTiger/bn-agent-hack.git && cd bn-agent-hack
+python3 -m pip install pytest matplotlib
 python3 -m pytest tests/ -v            # 18 tests, including the Labor Day assertion
 python3 scripts/gap_analysis.py        # off-hours vs. opening volatility, all symbols
 python3 scripts/cohort_stats.py        # the §1 and §4 tables, with cohort filtering shown
