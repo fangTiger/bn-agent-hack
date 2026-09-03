@@ -52,8 +52,14 @@ does not extend to subdirectories, so always use absolute paths.
 5. After each order, immediately re-query with `spot_getOrder` to confirm its real
    status. Do not trust the submission response alone.
 6. Append results to `$P/log/execution_$D.jsonl`, one JSON object per line:
-   `{"ts","symbol","action","order_id","status","executed_qty","reason",
-     "decision_risk_before","decision_risk_after"}`
+   `{"ts","exchange_time_ms","symbol","action","order_id","status","executed_qty",
+     "reason","decision_risk_before","decision_risk_after"}`
+
+   **`ts` and `exchange_time_ms` must come from the exchange response**
+   (`transactTime` on the order, or `time` from `spot_getOrder`) — never from your own
+   clock. These receipts are the project's primary evidence and a reviewer can check
+   them against Binance's records; a timestamp you invented, even off by a timezone,
+   would make genuine orders look falsified. Render `ts` as UTC ISO-8601 with a `Z`.
 
 ## Hard boundaries — violating any one of these is a failure
 
