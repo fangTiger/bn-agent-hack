@@ -18,7 +18,11 @@ protective order the exchange can execute while you are offline.
 
 ## What to do now
 
-Let `P=/Users/captain/python/Claude/bn-ai-2` and `D=<today's UTC date, e.g. 2026-09-03>`.
+Let `P=/Users/captain/python/Claude/bn-ai-2` and `D=` the output of `date -u +%Y-%m-%d`.
+
+**Run that command — do not infer the date.** Your local clock may already be on the
+next day while UTC is not; naming files by local date breaks the correspondence with
+the idempotency ledger, which is keyed on the UTC session close.
 
 **Note:** your working directory is `/Users/captain/python/Claude` (the directory the
 Binance MCP server is authorised in), while the project lives in `$P`. MCP authorisation
