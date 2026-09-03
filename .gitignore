@@ -1,0 +1,19 @@
+# 行情缓存：全部可由 scripts/ 与 src/calibrate.py 重新拉取
+data/*_1h.json
+data/*_1d.json
+data/*_30m.json
+
+# 运行时产物
+log/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+
+# 真实账户快照，含持仓与权益，不得提交
+# 注意：gitignore 不支持行尾注释，模式必须独占一行
+state/
+
+# 内部工作文档：含参赛策略分析，不公开
+docs/plans/
+docs/submission/
