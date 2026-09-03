@@ -5,6 +5,9 @@ data/*_30m.json
 
 # 运行时产物
 log/
+# 例外：决策与成交回执是本项目的核心证据，必须公开
+!log/decision_*.json
+!log/execution_*.jsonl
 __pycache__/
 *.pyc
 .pytest_cache/

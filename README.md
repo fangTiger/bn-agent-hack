@@ -178,8 +178,17 @@ Real capital, real orders, in an Agentic sub-account.
 - Risk budget: 1.5% of equity per opening event
 - Worst case (all four stops filling on the limit leg): **−7 USDT**
 
-*(Execution logs from the 2026-09-03 and 2026-09-04 closes are in `log/`. The
-2026-09-04 close is the one that spans Labor Day.)*
+Positions opened 2026-09-03, equal-risk weighted so that three of the four contribute
+an identical 1.08 USDT of stress loss. SPYB is capped by a concentration limit rather
+than by risk: at a 0.34% p90 gap, equal-risk weighting would demand a 318 USDT position,
+which exceeds the entire account. **That constraint is structural, not a funding
+shortfall** — the required notional scales linearly with equity, so no amount of capital
+resolves it. Every risk-parity book needs a concentration cap for exactly this reason.
+
+Decision reasoning and order receipts are committed to `log/` as each session runs:
+`log/decision_<date>.json` (what it decided and why) and `log/execution_<date>.jsonl`
+(order IDs and verified fills). The 2026-09-04 close is the notable one — it is the
+session whose next open is Tuesday the 8th, not Monday the 7th.
 
 ## 8. Limitations — stated up front
 
