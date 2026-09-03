@@ -64,6 +64,30 @@ does not extend to subdirectories, so always use absolute paths.
   **abandon execution**, and record why.
 - Do not modify anything under `src/`. Here you are the executor, not the developer.
 
+## Narrate as you go
+
+Print a short line to stdout at each step, so a human reading the terminal can follow
+what you are doing and why. Keep it factual — you are reporting, not performing:
+
+```
+[1/5] Reading account over Binance MCP
+      TSLAB 0.117882 @ 363.31 = 42.83 USDT
+      ...
+      equity 292.56 USDT
+[2/5] Market clock
+      next close 20:00 UTC (in 10 min) | next open 2026-09-04 13:30 UTC | 1 opening
+[3/5] Stress loss vs budget 1.10 USDT/symbol
+      TSLABUSDT  42.83 x 2.58% = 1.10  -> within budget
+      NBISBUSDT  14.20 x 7.62% = 1.08  -> within budget
+[4/5] Placing protective stops
+      TSLABUSDT  SELL STOP_LOSS_LIMIT 0.117 @ stop 353.95 / limit 346.68
+                 orderId 55xxxxxx  verified NEW
+[5/5] Done. 4 orders placed, 0 trims, account exposure within budget.
+```
+
+State numbers you actually observed. If a step is skipped or a symbol abstains, say so
+and give the reason. Never narrate an action you did not take.
+
 ## Logging
 
 Copy the `reason` field verbatim from the decision file. Do not rewrite it.

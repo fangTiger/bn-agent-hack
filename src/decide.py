@@ -490,7 +490,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true", help="demonstrate decisions with synthetic positions")
     parser.add_argument("--input", type=Path, help="account snapshot JSON (written by Claude Code over MCP)")
     parser.add_argument("--output", type=Path, help="path for the decision output JSON")
+    parser.add_argument(
+        "--log-dir", type=Path,
+        help="override the idempotency ledger directory; use a scratch path for "
+             "rehearsals so they cannot suppress a later real run",
+    )
     arguments = parser.parse_args(argv)
+    if arguments.log_dir:
+        # 幂等台账目录必须可覆盖：演练若写进 log/，真实运行会被判为重复而全部弃权
+        global LOG_DIR
+        LOG_DIR = arguments.log_dir
     if arguments.dry_run:
         return _dry_run()
     if arguments.input and arguments.output:
