@@ -16,9 +16,8 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from gap_analysis import fetch_klines, to_utc  # noqa: E402
+from src.calibrate import fetch_klines, to_utc  # noqa: E402
 from src.market_clock import MarketClock  # noqa: E402
 
 CLOCK = MarketClock()

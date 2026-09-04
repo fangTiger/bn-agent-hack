@@ -20,9 +20,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
-from gap_analysis import fetch_klines, to_utc  # noqa: E402
+from src.calibrate import fetch_klines, to_utc  # noqa: E402
 from src.calibrate import calibrate  # noqa: E402
 from src.market_clock import MarketClock  # noqa: E402
 

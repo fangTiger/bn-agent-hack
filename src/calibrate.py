@@ -74,6 +74,11 @@ def fetch_klines(symbol: str, interval: str = "30m") -> list:
     return bars
 
 
+def to_utc(milliseconds: int) -> datetime:
+    """把币安的毫秒时间戳转成带时区的 UTC 时间。"""
+    return datetime.fromtimestamp(milliseconds / 1000, tz=timezone.utc)
+
+
 def calibrate(symbol: str, clock: MarketClock) -> GapProfile:
     """计算标的开盘后首根收益分布和休市时段陈旧度倍数。"""
     bars = fetch_klines(symbol, interval="30m")
