@@ -23,3 +23,6 @@ state/
 # 内部工作文档：含参赛策略分析，不公开
 docs/plans/
 docs/submission/
+
+# 视频成品体积大，不入库（提交走 YouTube 链接）
+video/

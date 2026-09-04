@@ -33,9 +33,15 @@ DEMO = ["SPYBUSDT", "BMNRBUSDT", "TSLABUSDT", "NBISBUSDT"]
 AUTO = "--auto" in sys.argv
 
 
+# 每屏停留时长对应该屏旁白的实际长度（scripts/../vo/manifest.json）加余量，
+# 录制时画面与解说才能对齐
+NARRATION_PACING = [19, 18, 17, 13, 22, 23, 13]
+_screen = iter(NARRATION_PACING)
+
+
 def pause(seconds: float = 3.0) -> None:
     if AUTO:
-        time.sleep(seconds)
+        time.sleep(next(_screen, seconds))
     else:
         input(f"\n{DIM}    [enter]{R}")
     print()
@@ -78,7 +84,12 @@ def main() -> None:
         normal_all += normal
         holiday_all += holiday
     fill = json.loads((ROOT / "log" / "fill_2026-09-04.jsonl").read_text().strip())
-    print("\r" + " " * 40 + "\r", end="")
+    if AUTO:
+        # 清屏后静置：录制时以此处的画面跳变作为剪辑起点
+        print("\033[2J\033[H", end="", flush=True)
+        time.sleep(3)
+    else:
+        print("\r" + " " * 40 + "\r", end="")
 
     # ── 1. 悖论
     rule("A tokenized stock trades 24/7. Its underlying market does not.")
@@ -89,7 +100,7 @@ def main() -> None:
     print(f"    While the underlying is shut, the token moves {COOL}{off:.3%}{R} per 30 min.")
     print(f"    In the 30 min after it reopens:               {HOT}{opn:.3%}{R}")
     print(f"    {BOLD}{opn / off:.0f}x.{R}  The rest of the week, you are looking at a placeholder.")
-    pause()
+    pause(15)
 
     # ── 2. 因果，而非相关
     rule("Is it the opening, or just the time of day?")
@@ -102,7 +113,7 @@ def main() -> None:
     print(f"    {BOLD}{n_mean / h_mean:.1f}x difference.{R}  The spike simply does not appear.")
     below = sum(1 for x in holiday_all if x < 0.005)
     print(f"    {DIM}{below} of the {len(holiday_all)} holiday observations stayed under 0.5%.{R}")
-    pause()
+    pause(20)
 
     # ── 3. 先证伪，再建仓
     rule("Before building anything, I looked for a way to trade it.")
@@ -116,7 +127,7 @@ def main() -> None:
     print(f"\n    Direction is a coin flip. The momentum estimate is positive but")
     print(f"    {BOLD}smaller than the fee required to act on it.{R}")
     print(f"    {DIM}This market's efficiency boundary is set by its own fee.{R}")
-    pause()
+    pause(20)
 
     # ── 4. 因此：测量，而不是预测
     rule("So it does not predict. It measures — per symbol, never hard-coded.")
@@ -128,7 +139,7 @@ def main() -> None:
         print(f"    {symbol.replace('BUSDT',''):<6} stop at {colour}{'−' + format(profile.p90, '.2%'):>7}{R}  "
               f"{colour}{bar}{R} {DIM}({profile.p90/base:.0f}x SPY, n={profile.n_samples}){R}")
     print(f"\n    {BOLD}Same code, same run, {per_symbol['NBISBUSDT'][2].p90/base:.0f}x apart.{R}")
-    pause()
+    pause(15)
 
     # ── 5. 它知道现在几点
     rule("Why an agent, and not a cron line?")
@@ -148,7 +159,7 @@ def main() -> None:
         print(f"      {SIGNAL}{part}{R}")
     print(f"\n    {DIM}Risk is counted in openings, not hours: "
           f"{clock.openings_between(friday_close, clock.next_open(friday_close))} opening, not 3 days.{R}")
-    pause()
+    pause(26)
 
     # ── 6. 真实执行
     rule("It ran on real money. Then the market tested it.")
@@ -163,18 +174,20 @@ def main() -> None:
     print(f"      slippage vs stop price   {OK}{abs(fill['slippage_vs_stop_pct']):.2f}%{R}")
     print(f"      limit-leg buffer we set  {DIM}2.00%{R}")
     print(f"      {BOLD}It used one fiftieth of the cushion.{R}")
-    pause()
+    pause(26)
 
     # ── 7. 可核验
     rule("None of this is a mock-up.")
-    print(f"    Agentic sub-account   UID {BOLD}1273134738{R}")
+    # 不公开 UID：订单查询是鉴权接口，外人无从验证，公开它只留下风险。
+    # 账户标识随提交表单给到评委即可。
+    print(f"    Agentic sub-account   {DIM}real and funded; UID filed with the judges{R}")
     print(f"    Order                 {BOLD}{fill['order_id']}{R}  ({fill['symbol']})")
     print(f"    Exchange timestamp    {fill['exchange_time_ms']}")
     print(f"    Filled for            {fill['cummulative_quote_qty']} USDT")
-    print(f"\n    {DIM}Every order ID is live on Binance. Every number above was just{R}")
-    print(f"    {DIM}recomputed from public market data on this machine. Check them.{R}")
+    print(f"\n    {DIM}Every statistic above was recomputed from public market data as this{R}")
+    print(f"    {DIM}ran. The raw exchange receipts are committed in the repository.{R}")
     print(f"\n    {DIM}github.com/fangTiger/bn-agent-hack{R}")
-    pause()
+    pause(16)
 
     print(f"\n{BOLD}    The token trades 24/7.{R}")
     print(f"{BOLD}    Its price-discovery clock does not.{R}\n")
