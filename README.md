@@ -194,9 +194,32 @@ shortfall** — the required notional scales linearly with equity, so no amount 
 resolves it. Every risk-parity book needs a concentration cap for exactly this reason.
 
 Decision reasoning and order receipts are committed to `log/` as each session runs:
-`log/decision_<date>.json` (what it decided and why) and `log/execution_<date>.jsonl`
-(order IDs and exchange-verified order status). The 2026-09-04 close is the notable one — it is the
-session whose next open is Tuesday the 8th, not Monday the 7th.
+`log/decision_<date>.json` (what it decided and why), `log/execution_<date>.jsonl`
+(order IDs and exchange-verified order status), and `log/fill_<date>.jsonl` (stops that
+the market subsequently triggered).
+
+### What the market did to it
+
+Three of the four stops were triggered within 15 hours of being placed.
+
+| Symbol | Filled (UTC) | Stop | Avg fill | Slippage | Share of the 2pp buffer used |
+|---|---|---|---|---|---|
+| TSLAB | 2026-09-04 00:09 | 373.15 | 373.07 | −0.021% | 1.0% |
+| BMNRB | 2026-09-04 12:37 | 25.19 | 25.17 | −0.079% | 3.9% |
+| SPYB | 2026-09-04 14:55 | 769.64 | 769.53 | −0.014% | 0.7% |
+
+NBISB, whose stop sits furthest out at −7.62%, was not triggered — which is what its
+calibration predicts.
+
+This is the first measurement of what the limit leg actually costs here: the worst of the
+three consumed 3.9% of the two-percentage-point buffer. It does not retire the caveat above
+— a fast enough gap can still step over the limit price and leave the order resting — but it
+does say the buffer is not obviously mis-sized for this venue.
+
+**The three exits netted +6.01 USDT against their entry cost. That is directional luck and
+not evidence for anything.** The stops happened to trigger while the positions were in
+profit; had prices moved the other way the same three exits would have been small losses and
+the mechanism would have behaved identically. Nothing here should be read as a return.
 
 ## 8. Limitations — stated up front
 
