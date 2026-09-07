@@ -103,33 +103,51 @@ Step 2 succeeding is the green light for everything else.
 ## Part 3 — Automation
 
 ```bash
-crontab -e
-# */15 * * * * /abs/path/to/bn-ai-2/ops/tick.sh >> /abs/path/to/bn-ai-2/log/cron.log 2>&1
+cp ops/com.openingbell.guard.plist ~/Library/LaunchAgents/   # edit the paths inside first
+launchctl load ~/Library/LaunchAgents/com.openingbell.guard.plist
 ```
+
+It fires every 900 seconds unconditionally.
 
 **Never encode market hours in cron.** `30 13 * * 1-5` fires on Labor Day for an
 opening that does not exist — the exact bug this project exists to criticise. The
 schedule is unconditional; `src/market_clock.py` decides whether to act.
 
-> **Trap 6 — three separate reasons `claude -p` dies under cron, all silent.**
-> Reproduce them all before trusting an unattended run:
+> **Trap 6 — `claude -p` dies under cron, and `env -i` will not tell you why.**
+> An earlier version of this guide blamed a missing `USER`/`LOGNAME`. That was wrong, and
+> the wrong diagnosis cost us two unattended runs before we noticed.
+>
+> Three things genuinely break under cron:
+> 1. **`PATH` is minimal** → `claude` and `python3` are not found.
+> 2. **`claude` may be a shell alias.** On this machine `~/.zshrc` aliases it with proxy
+>    variables; cron does not read `.zshrc`, so the real binary runs with no proxy and
+>    cannot reach the API. Use the absolute path and export the proxy vars.
+> 3. **Credentials.** Claude Code keeps its OAuth token in the macOS login Keychain, and a
+>    cron job is not a member of your GUI login session, so it cannot read that Keychain at
+>    all. The symptom is `Not logged in · Please run /login` — an authentication error
+>    reported for what is really a session-context problem, which sends you off to
+>    re-authenticate and change nothing.
+>
 > ```bash
 > env -i HOME=$HOME /bin/bash ops/tick.sh
 > ```
-> 1. **`PATH` is minimal** → `claude` and `python3` are not found.
-> 2. **`claude` may be a shell alias.** On this machine `~/.zshrc` aliases it with
->    proxy variables; cron does not read `.zshrc`, so the real binary runs without a
->    proxy and cannot reach the API. Use the absolute path and export the proxy vars.
-> 3. **Missing `USER`/`LOGNAME` → `Not logged in`.** Credentials live in the macOS
->    Keychain (`security find-generic-password -s "Claude Code-credentials"`), and
->    reading them needs the identity variables. This is the nastiest one: it reports
->    an auth error, not an environment error, sending you off to re-run `/login`
->    for no reason.
+> catches (1) and (2) but **cannot catch (3)**. A process you start from your own terminal
+> inherits your security session, so the Keychain read succeeds and the test passes while
+> real cron keeps failing. We passed that test and shipped anyway.
 >
-> All three are handled at the top of `ops/tick.sh`.
+> **On macOS, schedule with a LaunchAgent, not cron.** It runs inside the user session and
+> reads the Keychain normally:
+>
+> ```bash
+> cp ops/com.openingbell.guard.plist ~/Library/LaunchAgents/   # edit the paths inside first
+> launchctl load ~/Library/LaunchAgents/com.openingbell.guard.plist
+> launchctl list | grep openingbell
+> ```
+>
+> To prove the credential path specifically, install a throwaway agent that runs
+> `claude -p "Reply with exactly: AUTH_OK"` and read its log. Nothing short of running under
+> the real scheduler proves anything about the real scheduler.
 
-> **Trap 7 — `crontab <path>` truncates long paths.** It silently dropped the last
-> character of our scratch path. Pipe it instead: `crontab - <<EOF ... EOF`.
 
 Confirm cron actually runs — installing is not the same as executing:
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.openingbell.guard</string>
+
+  <!-- 每 15 分钟无条件唤醒。是否行动由 src/market_clock.py 判断，
+       此处对「市场几点开盘」一无所知——这正是本项目要坚持的一点。 -->
+  <key>StartInterval</key>
+  <integer>900</integer>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/captain/python/Claude/bn-ai-2/ops/tick.sh</string>
+  </array>
+
+  <key>StandardOutPath</key>
+  <string>/Users/captain/python/Claude/bn-ai-2/log/cron.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/captain/python/Claude/bn-ai-2/log/cron.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

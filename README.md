@@ -136,8 +136,8 @@ Same code, same run, **22x difference** in stop distance.
 **2026-09-07 is Labor Day. The US market is closed.**
 
 A scheduler written as `30 13 * * 1-5` fires that Monday for an opening that does not
-exist. Our crontab is `*/15 * * * *` — it knows nothing about market hours. Every
-temporal decision lives in one place, `src/market_clock.py`, which is the only module
+exist. Ours fires unconditionally every 900 seconds and knows nothing about market hours.
+Every temporal decision lives in one place, `src/market_clock.py`, which is the only module
 in this repository with mandatory unit tests:
 
 ```python
@@ -160,7 +160,7 @@ Binance MCP is authorised via OAuth — there is no API key, so **Python cannot 
 orders**. This forced a clean split, and it turns out to be the right one:
 
 ```
-cron (*/15, knows nothing about markets)
+LaunchAgent (every 900s, knows nothing about markets)
    └─ ops/tick.sh ── MarketClock: are we in the guard window?
          └─ (only if yes) claude -p ── the agent
                ├─ Binance MCP: read account + prices

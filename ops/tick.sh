@@ -9,9 +9,9 @@
 # （例如 `30 13 * * 1-5`）——那样的 crontab 在 2026-09-07 劳动节
 # 会触发一次不存在的开盘。所以这里只能是 */15 * * * *。
 #
-# 安装：
-#   crontab -e
-#   */15 * * * * /Users/captain/python/Claude/bn-ai-2/ops/tick.sh >> /Users/captain/python/Claude/bn-ai-2/log/cron.log 2>&1
+# 安装（macOS 用 LaunchAgent，不要用 cron，原因见下）：
+#   cp ops/com.openingbell.guard.plist ~/Library/LaunchAgents/
+#   launchctl load ~/Library/LaunchAgents/com.openingbell.guard.plist
 
 set -euo pipefail
 
@@ -19,8 +19,14 @@ set -euo pipefail
 #   1) PATH —— cron 默认找不到 /opt/homebrew/bin/claude 与 /usr/local/bin/python3
 #   2) 代理 —— 本机的 claude 是带代理前缀的 shell alias（见 ~/.zshrc:33），
 #      不设代理则连不上 Anthropic API。注意这要求本地代理进程处于运行状态。
-#   3) USER/LOGNAME —— claude 的登录凭据存在 macOS Keychain（Claude Code-credentials），
-#      读取它需要用户身份变量；缺失时 claude 会报 "Not logged in" 而静默失败
+#   3) USER/LOGNAME —— 部分工具依赖用户身份变量
+#
+# 关于凭据（实测教训）：Claude Code 的 OAuth token 存在 macOS 登录 Keychain 里，
+# 而 cron 任务不属于用户的 GUI 登录会话，根本读不到该 Keychain——报的却是
+# "Not logged in"，一个会把人引向重新登录的假线索。补 USER/LOGNAME 并不能解决。
+# 因此本项目改用 LaunchAgent 调度（ops/com.openingbell.guard.plist），
+# 它运行在用户会话内，可正常读取 Keychain。
+# 注意：`env -i` 从自己的终端启动无法复现该问题——它继承了你的安全会话。
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 export USER="${USER:-$(id -un)}"
 export LOGNAME="${LOGNAME:-$USER}"
